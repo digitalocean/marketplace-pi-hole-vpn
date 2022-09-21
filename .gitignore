@@ -6,3 +6,13 @@ crash.log
 
 # For built boxes
 *.box
+
+# Terraform
+*.tfvars
+*.tfstate
+*.tfstate.backup
+*.lock.hcl
+.terraform
+
+# Packer
+variables.pkr.hcl
