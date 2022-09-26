@@ -48,13 +48,13 @@ First, generate an `API_TOKEN` on the [API
 page](https://cloud.digitalocean.com/account/api/tokens). Then,
 create a vars file:
 
-    echo 'do_token = <API_TOKEN>' > variables.pkr.hcl
+    echo 'do_token = "API_TOKEN"' > variables.auto.pkrvars.hcl
 
-Finnaly, validate and build the image:
+Finally, validate and build the image:
 
-    packer init -upgrade main.pkr.hcl
-    packer validate -var-file=variables.pkr.hcl main.pkr.hcl
-    packer build -var-file=variables.pkr.hcl main.pkr.hcl
+    packer init .
+    packer validate .
+    packer build .
 
 ### Provision Droplets for Testing
 
@@ -66,21 +66,25 @@ terraform.
 First, we need to create a vars file:
 
     cd terraform
-    echo 'do_token = "API_TOKEN"' > delete.terraform.tfvars
-    echo 'image    = "IMAGE_ID"' >> delete.terraform.tfvars
-    echo 'ssh_keys = [SSH_ID]'   >> delete.terraform.tfvars
+    echo 'do_token = "API_TOKEN"' > delete.terraform.auto.tfvars
+    echo 'image    = "IMAGE_ID"' >> delete.terraform.auto.tfvars
+    echo 'ssh_keys = [SSH_ID]'   >> delete.terraform.auto.tfvars
+    
+_!note that the square brackets around SSH_ID are required `[]`!_
 
 Now that we have a template, let's grab the required information:
 
-**API_TOKEN:** If you haven't already, generate a new token on the
-  [API page](https://cloud.digitalocean.com/account/api/tokens).
+**API_TOKEN:** use the same API_TOKEN that you generated above
 
-**IMAGE_ID:**  Found in the URL (`imageId=` for Snapshots,
-  `distroImage=` for Distrutions) of the [Create
-  Droplets page](https://cloud.digitalocean.com/droplets/new)
-  after selecting the desired image. The `IMAGE_ID` for the distro
-  Pi-Hole VPN is based on is `debian-11-x64`. Alternatively, using
-  your `API_TOKEN` you can get the `IMAGE_ID` via the API:
+**IMAGE_ID:** a string of several numbers - the packer build
+above will output an Image ID.
+
+Alternatively, you may find the Image ID in the URL
+(`imageId=` for Snapshots, `distroImage=` for Distributions)
+of the [Create Droplets page](https://cloud.digitalocean.com/droplets/new)
+after selecting the desired image in the "Snapshots" tab.
+  
+You may also acquire your `IMAGE_ID` from the API:
 
 * Distributions
 
@@ -98,10 +102,10 @@ Now that we have a template, let's grab the required information:
         "https://api.digitalocean.com/v2/images?private=true" | \
         jq -r '.images | .[] | [.id, .name] | @tsv'
 
-**SSH_ID:** Add your SSH public key on the [Settings -> Security
+**SSH_ID:** your SSH public key - find this on the [Settings -> Security
 page](https://cloud.digitalocean.com/account/security) or
-alternatively, using your `API_TOKEN` upload your public key via
-the API:
+alternatively, using your `API_TOKEN` to upload your public key
+via the API:
 
       curl -X POST \
       -H "Content-Type: application/json" \
@@ -123,10 +127,20 @@ Otherwise, using your `API_TOKEN` grab the `SSH_ID` via the API:
 If you don't already have Terraform installed, checkout
 Terraform's [installation page
 ](https://learn.hashicorp.com/tutorials/terraform/install-cli).
+The terraform code requires version 1.2.0 or later.
 
 Make sure you've setup your vars file as described in the previous
 section. Then:
 
     terraform init
+    terraform validate
     terraform plan
     terraform apply
+
+You may use `terraform show` to see your Droplet's IP address:
+
+    terraform show
+
+Finally, to destroy your Droplet:
+
+    terraform destroy
