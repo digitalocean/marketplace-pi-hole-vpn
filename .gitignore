@@ -16,3 +16,4 @@ crash.log
 
 # Packer
 variables.pkr.hcl
+*.pkrvars.hcl
