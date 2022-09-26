@@ -52,6 +52,7 @@ create a vars file:
 
 Finally, validate and build the image:
 
+    packer init .
     packer validate .
     packer build .
 
@@ -131,6 +132,7 @@ The terraform code requires version 1.2.0 or later.
 Make sure you've setup your vars file as described in the previous
 section. Then:
 
+    terraform init
     terraform validate
     terraform plan
     terraform apply
