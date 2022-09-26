@@ -66,7 +66,7 @@ It is recommended to upgrade at least once a month:
     apt update
     apt upgrade
     reboot # if necessary
-    pi-hole -up
+    pihole -up
 
 PIHOLE █
 ▄▄▄▄▄▄▄█

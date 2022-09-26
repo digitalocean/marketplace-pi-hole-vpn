@@ -61,66 +61,85 @@ Finally, validate and build the image:
 The recommended way to provision droplets for testing is by using
 terraform.
 
+Use Cases:
+1. You created an image by following the steps in the [Create the
+   Pi-Hole VPN Image](#create-the-pi-hole-vpn-image) section above
+   and you would like to now create a Droplet using that image.
+2. You want to create a Droplet using the image that the packer
+   build is based off of so you can test the build scripts in a
+   clean environment.
+
 #### Terraform Configuration
+
 
 First, we need to create a vars file:
 
     cd terraform
-    echo 'do_token = "API_TOKEN"' > delete.terraform.auto.tfvars
-    echo 'image    = "IMAGE_ID"' >> delete.terraform.auto.tfvars
-    echo 'ssh_keys = [SSH_ID]'   >> delete.terraform.auto.tfvars
+    echo 'do_token = "API_TOKEN"' > terraform.auto.tfvars
+    echo 'image    = "IMAGE_ID"' >> terraform.auto.tfvars
+    echo 'ssh_keys = [SSH_ID]'   >> terraform.auto.tfvars
     
-_!note that the square brackets around SSH_ID are required `[]`!_
+_NB: the square brackets `[]` around `SSH_ID` are required._
 
 Now that we have a template, let's grab the required information:
 
-**API_TOKEN:** use the same API_TOKEN that you generated above
+**API_TOKEN:** use the API_TOKEN that you generated in the [Create
+the Pi-Hole VPN Image](#create-the-pi-hole-vpn-image) section
+above.
 
-**IMAGE_ID:** a string of several numbers - the packer build
-above will output an Image ID.
+**IMAGE_ID:** the `IMAGE_ID` you use here depends on the use case
+(listed [above](#provision-droplets-for-testing))
 
-Alternatively, you may find the Image ID in the URL
-(`imageId=` for Snapshots, `distroImage=` for Distributions)
-of the [Create Droplets page](https://cloud.digitalocean.com/droplets/new)
-after selecting the desired image in the "Snapshots" tab.
-  
-You may also acquire your `IMAGE_ID` from the API:
+1. For use case 1, the `IMAGE_ID` is a string of numbers output by
+   the Packer build process.
+2. For use case 2, the `IMAGE_ID` is `debian-11-x64`
 
-* Distributions
+Alternatively:
 
-        curl -s -X GET \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer API_TOKEN" \
-        "https://api.digitalocean.com/v2/images?type=distribution" | \
-        jq -r '.images | .[] | [.id, .name] | @tsv'
+* Find the `IMAGE_ID` in the URL (`imageId=` for Snapshots,
+  `distroImage=` for Distributions) of the [Create Droplets
+  page](https://cloud.digitalocean.com/droplets/new) after
+  selecting the desired image in the "Snapshots" tab.
+* Acquire the `IMAGE_ID` from the API:
 
-* Snapshots
+    - Distributions
 
-        curl -s -X GET \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer API_TOKEN" \
-        "https://api.digitalocean.com/v2/images?private=true" | \
-        jq -r '.images | .[] | [.id, .name] | @tsv'
+            curl -s -X GET \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer API_TOKEN" \
+            "https://api.digitalocean.com/v2/images?type=distribution" | \
+            jq -r '.images | .[] | [.id, .name] | @tsv'
 
-**SSH_ID:** your SSH public key - find this on the [Settings -> Security
-page](https://cloud.digitalocean.com/account/security) or
-alternatively, using your `API_TOKEN` to upload your public key
-via the API:
+    - Snapshots
 
-      curl -X POST \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer API_TOKEN" \
-      -d "{\"name\":\"Pi-Hole Key\",\"public_key\":\"$(cat test_rsa.pub)\"}" \
-      "https://api.digitalocean.com/v2/account/keys"
+            curl -s -X GET \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer API_TOKEN" \
+            "https://api.digitalocean.com/v2/images?private=true" | \
+            jq -r '.images | .[] | [.id, .name] | @tsv'
 
-If you uploaded your public key via the API, your `SSH_ID` will be in the respone.
-Otherwise, using your `API_TOKEN` grab the `SSH_ID` via the API:
+**SSH_ID:** DO's ID for your SSH public key. You can obtain the
+`SSH_ID` for any previously added keys (i.e. any public keys
+added via the API or via the [Settings -> Security
+page](https://cloud.digitalocean.com/account/security)) with the
+following query:
 
         curl -s -X GET \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer API_TOKEN" \
         "https://api.digitalocean.com/v2/account/keys" | \
         jq -r '.ssh_keys | .[] | [.name, .id] | @tsv'
+
+If you haven't yet added a key, you can use the query below to
+upload your SSH public key and get its `SSH_ID`:
+
+      curl -X POST \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer API_TOKEN" \
+      -d "{\"name\":\"Pi-Hole Key\",\"public_key\":\"$(cat ~/.ssh/id_rsa.pub)\"}" \
+      "https://api.digitalocean.com/v2/account/keys"
+
+
 
 #### Terraform Use
 
