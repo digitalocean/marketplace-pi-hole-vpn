@@ -52,6 +52,7 @@ create a vars file:
 
 Finnaly, validate and build the image:
 
+    packer init -upgrade main.pkr.hcl
     packer validate -var-file=variables.pkr.hcl main.pkr.hcl
     packer build -var-file=variables.pkr.hcl main.pkr.hcl
 
@@ -126,5 +127,6 @@ Terraform's [installation page
 Make sure you've setup your vars file as described in the previous
 section. Then:
 
+    terraform init
     terraform plan
     terraform apply
