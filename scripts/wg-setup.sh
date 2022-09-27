@@ -35,7 +35,7 @@ ip6tables -w -D INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT; \
 iptables  -w -D INPUT -i wg0 -j ACCEPT; \
 ip6tables -w -D INPUT -i wg0 -j ACCEPT; \
 iptables  -w -D FORWARD -i wg0 -j ACCEPT; \
-iptables  -w -D FORWARD -i wg0 -j ACCEPT; \
+ip6tables -w -D FORWARD -i wg0 -j ACCEPT; \
 iptables  -w -D POSTROUTING -o eth0 -j MASQUERADE -t nat; \
 ip6tables -w -D POSTROUTING -o eth0 -j MASQUERADE -t nat"
     pvk="$(wg genkey)"
