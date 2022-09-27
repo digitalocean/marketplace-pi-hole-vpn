@@ -14,7 +14,9 @@ variable "do_token" {
 
 source "digitalocean" "bullseye" {
   api_token = var.do_token
+  droplet_agent = false
   image = "debian-11-x64"
+  monitoring = false
   region = "nyc1"
   size = "s-1vcpu-512mb-10gb"
   ssh_username = "root"

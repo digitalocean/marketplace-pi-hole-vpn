@@ -19,11 +19,12 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_droplet" "pihole" {
-  image      = var.image
-  ipv6       = true
-  monitoring = false
-  name       = "pihole"
-  region     = "nyc1"
-  size       = "s-1vcpu-512mb-10gb"
-  ssh_keys   = var.ssh_keys
+  droplet_agent = false
+  image         = var.image
+  ipv6          = true
+  monitoring    = false
+  name          = "pihole"
+  region        = "nyc1"
+  size          = "s-1vcpu-512mb-10gb"
+  ssh_keys      = var.ssh_keys
 }
