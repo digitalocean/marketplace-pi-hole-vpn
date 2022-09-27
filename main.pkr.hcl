@@ -8,18 +8,18 @@ packer {
 }
 
 variable "do_token" {
-  type = string
+  type      = string
   sensitive = true
 }
 
 source "digitalocean" "bullseye" {
-  api_token = var.do_token
+  api_token     = var.do_token
   droplet_agent = false
-  image = "debian-11-x64"
-  monitoring = false
-  region = "nyc1"
-  size = "s-1vcpu-512mb-10gb"
-  ssh_username = "root"
+  image         = "debian-11-x64"
+  monitoring    = false
+  region        = "nyc1"
+  size          = "s-1vcpu-512mb-10gb"
+  ssh_username  = "root"
   snapshot_name = "marketplace-pi-hole-vpn-{{timestamp}}"
 }
 
@@ -39,15 +39,15 @@ build {
 
   # Setup system on first boot after provisioning
   provisioner "file" {
-    source = "scripts/ssh-lock.sh"
+    source      = "scripts/ssh-lock.sh"
     destination = "/tmp/"
   }
   provisioner "file" {
-    source = "scripts/system-setup.sh"
+    source      = "scripts/system-setup.sh"
     destination = "/tmp/"
   }
   provisioner "file" {
-    source = "scripts/ssh-unlock.sh"
+    source      = "scripts/ssh-unlock.sh"
     destination = "/tmp/"
   }
   provisioner "shell" {
@@ -65,7 +65,7 @@ build {
   # Setup wireguard on first boot after provisioning and install utility
   # script for users
   provisioner "file" {
-    source = "scripts/wg-setup.sh"
+    source      = "scripts/wg-setup.sh"
     destination = "/tmp/"
   }
   provisioner "shell" {
@@ -80,7 +80,7 @@ build {
 
   # Setup pihole on first boot after provisioning
   provisioner "file" {
-    source = "scripts/pihole-setup.sh"
+    source      = "scripts/pihole-setup.sh"
     destination = "/tmp/"
   }
   provisioner "shell" {
@@ -93,7 +93,7 @@ build {
 
   # Setup unbound on first boot after provisioning
   provisioner "file" {
-    source = "scripts/unbound-setup.sh"
+    source      = "scripts/unbound-setup.sh"
     destination = "/tmp/"
   }
   provisioner "shell" {
