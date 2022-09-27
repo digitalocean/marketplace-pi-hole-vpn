@@ -1,4 +1,4 @@
-# Pi-Hole VPN [Beta]
+# Pi-hole VPN [Beta]
 
 Pi-hole VPN image with Unbound and Wireguard
 
@@ -13,7 +13,7 @@ Cool, cool cool cool...so how do I...
 
 **NB:** The image has not yet been posted to the Marketplace. Stay
 tuned. In the meantime, you can create your own image if you like.
-See the [Create the Pi-Hole VPN
+See the [Create the Pi-hole VPN
 Image](#create-the-pi-hole-vpn-image) section below.
 
 If you want to get up and running in as little time as possible:
@@ -31,7 +31,7 @@ Slightly more info:
 (🤞) work just fine on one
 * First boot setup takes a bit of time
     - Why? On first boot, the OS is updated. Then, WireGuard,
-      Pi-Hole, & Unbound are installed.
+      Pi-hole, & Unbound are installed.
 * When you SSH in, you'll be promted with a pair of QR codes to
   scan (I recommend scanning both):
     - one for a DNS only VPN client configuration
@@ -42,7 +42,7 @@ Slightly more info:
 
 ## Contribute Changes
 
-### Create the Pi-Hole VPN Image
+### Create the Pi-hole VPN Image
 
 First, generate an `API_TOKEN` on the [API
 page](https://cloud.digitalocean.com/account/api/tokens). Then,
@@ -63,7 +63,7 @@ terraform.
 
 Use Cases:
 1. You created an image by following the steps in the [Create the
-   Pi-Hole VPN Image](#create-the-pi-hole-vpn-image) section above
+   Pi-hole VPN Image](#create-the-pi-hole-vpn-image) section above
    and you would like to now create a Droplet using that image.
 2. You want to create a Droplet using the image that the packer
    build is based off of so you can test the build scripts in a
@@ -84,7 +84,7 @@ _NB: the square brackets `[]` around `SSH_ID` are required._
 Now that we have a template, let's grab the required information:
 
 **API_TOKEN:** use the API_TOKEN that you generated in the [Create
-the Pi-Hole VPN Image](#create-the-pi-hole-vpn-image) section
+the Pi-hole VPN Image](#create-the-pi-hole-vpn-image) section
 above.
 
 **IMAGE_ID:** the `IMAGE_ID` you use here depends on the use case
@@ -136,7 +136,7 @@ upload your SSH public key and get its `SSH_ID`:
       curl -X POST \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer API_TOKEN" \
-      -d "{\"name\":\"Pi-Hole Key\",\"public_key\":\"$(cat ~/.ssh/id_rsa.pub)\"}" \
+      -d "{\"name\":\"Pi-hole Key\",\"public_key\":\"$(cat ~/.ssh/id_rsa.pub)\"}" \
       "https://api.digitalocean.com/v2/account/keys"
 
 
