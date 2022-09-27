@@ -1,16 +1,14 @@
 #!/bin/bash
 
 # DigitalOcean Marketplace Image Validation Tool
-# © 2021 DigitalOcean LLC.
+# © 2021-2022 DigitalOcean LLC.
 # This code is licensed under Apache 2.0 license (see LICENSE.md for details)
 
-
-VERSION="v. 1.6+PRS:152,155,156,157"
-# Source: https://github.com/digitalocean/marketplace-partners/blob/91196749955f75aa5e153c7412fb73860e566490/scripts/99-img-check.sh
-# + https://github.com/digitalocean/marketplace-partners/pull/152
-# + https://github.com/digitalocean/marketplace-partners/pull/155
-# + https://github.com/digitalocean/marketplace-partners/pull/156
-# + https://github.com/digitalocean/marketplace-partners/pull/157
+VERSION="v. 1.7+PRS:159-161"
+# Source: https://github.com/digitalocean/marketplace-partners/blob/83114187179f2769317493723bd2f3c0244d4d25/scripts/99-img-check.sh
+# + https://github.com/digitalocean/marketplace-partners/pull/159
+# + https://github.com/digitalocean/marketplace-partners/pull/160
+# + https://github.com/digitalocean/marketplace-partners/pull/161
 RUNDATE=$( date )
 
 # Script should be run with SUDO
@@ -76,15 +74,16 @@ SHADOW=$(cat /etc/shadow)
 }
 
 function checkAgent {
-  # Check for the presence of the do-agent in the filesystem
-  if [ -e /opt/digitalocean/do-agent ];then
-     echo -en "\e[41m[FAIL]\e[0m DigitalOcean Monitoring Agent detected.\n"
+  # Check for the presence of the DO directory in the filesystem
+  if [ -d /opt/digitalocean ];then
+     echo -en "\e[41m[FAIL]\e[0m DigitalOcean directory detected.\n"
             ((FAIL++))
             STATUS=2
       if [[ $OS == "CentOS Linux" ]] || [[ $OS == "CentOS Stream" ]] || [[ $OS == "Rocky Linux" ]]; then
-        echo "The agent can be removed with 'sudo yum remove do-agent' "
-      elif [[ $OS == "Ubuntu" ]]; then
-        echo "The agent can be removed with 'sudo apt-get purge do-agent' "
+        echo "To uninstall the agent: 'sudo yum remove droplet-agent'"
+        echo "To remove the DO directory: 'find /opt/digitalocean/ -type d -empty -delete'"
+      elif [[ $OS == "Ubuntu" ]] || [[ $OS == "Debian" ]]; then
+        echo "To uninstall the agent and remove the DO directory: 'sudo apt-get purge droplet-agent'"
       fi
   else
     echo -en "\e[32m[PASS]\e[0m DigitalOcean Monitoring agent was not found\n"
@@ -99,7 +98,8 @@ function checkLogs {
     for f in /var/log/*-????????; do
       [[ -e $f ]] || break
       if [ "${f}" != "${cp_ignore}" ]; then
-        echo -en "\e[93m[WARN]\e[0m Log archive ${f} found\n"
+        echo -en "\e[93m[WARN]\e[0m Log archive ${f} found; Contents:\n"
+        cat "${f}"
         ((WARN++))
         if [[ $STATUS != 2 ]]; then
             STATUS=1
@@ -108,7 +108,8 @@ function checkLogs {
     done
     for f in  /var/log/*.[0-9];do
       [[ -e $f ]] || break
-        echo -en "\e[93m[WARN]\e[0m Log archive ${f} found\n"
+        echo -en "\e[93m[WARN]\e[0m Log archive ${f} found; Contents:\n"
+        cat "${f}"
         ((WARN++))
         if [[ $STATUS != 2 ]]; then
             STATUS=1
@@ -118,7 +119,8 @@ function checkLogs {
       [[ -e $f ]] || break
       if [[ "${f}" = '/var/log/lfd.log' && "$(grep -E -v '/var/log/messages has been reset| Watching /var/log/messages' "${f}" | wc -c)" -gt 50 ]]; then
       if [ "${f}" != "${cp_ignore}" ]; then
-        echo -en "\e[93m[WARN]\e[0m un-cleared log file, ${f} found\n"
+        echo -en "\e[93m[WARN]\e[0m un-cleared log file, ${f} found; Contents:\n"
+        cat "${f}"
         ((WARN++))
         if [[ $STATUS != 2 ]]; then
             STATUS=1
@@ -126,7 +128,8 @@ function checkLogs {
       fi
       elif [[ "${f}" != '/var/log/lfd.log' && "$(wc -c < "${f}")" -gt 50 ]]; then
       if [ "${f}" != "${cp_ignore}" ]; then
-        echo -en "\e[93m[WARN]\e[0m un-cleared log file, ${f} found\n"
+        echo -en "\e[93m[WARN]\e[0m un-cleared log file, ${f} found; Contents:\n"
+        cat "${f}"
         ((WARN++))
         if [[ $STATUS != 2 ]]; then
             STATUS=1
@@ -522,7 +525,7 @@ elif [[ "$OS" =~ Debian.* ]]; then
             ;;
         11)
             osv=1
-            ;;
+            ;;            
         *)
             osv=2
             ;;
