@@ -38,6 +38,11 @@ Slightly more info:
     - one for a Full VPN client configuration
 * The README in the Droplet provides info on multiple clients,
   alternative ports, and more
+* Using Floating / Reserved IPs:
+    - Create your Droplet
+    - Assign your Reserved IP to the Droplet
+    - SSH in and scan the QR code
+    - Replace the Droplet IP with the Reserved IP in the config
 
 
 ## Contribute Changes
