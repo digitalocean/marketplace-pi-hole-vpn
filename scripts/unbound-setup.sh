@@ -23,7 +23,13 @@ server:
     do-udp: yes
     do-tcp: yes
     do-ip6: yes
+    access-control: 127.0.0.0/8 allow
+    access-control: 0.0.0.0/0 deny
+    access-control: ::1 allow
+    access-control: ::0/0 deny
     prefer-ip6: no
+    hide-identity: yes
+    hide-version: yes
     harden-glue: yes
     harden-dnssec-stripped: yes
     use-caps-for-id: no
