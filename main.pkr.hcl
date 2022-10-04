@@ -31,17 +31,11 @@ build {
   # Update the base image
   provisioner "shell" {
     scripts = [
-      "scripts/ssh-lock.sh",
       "scripts/system-setup.sh",
-      "scripts/ssh-unlock.sh"
     ]
   }
 
   # Setup system on first boot after provisioning
-  provisioner "file" {
-    source      = "scripts/ssh-lock.sh"
-    destination = "/tmp/"
-  }
   provisioner "file" {
     source      = "scripts/system-setup.sh"
     destination = "/tmp/"
@@ -53,10 +47,8 @@ build {
   provisioner "shell" {
     inline = [
       "mkdir -p                 /var/lib//cloud/scripts/per-instance/",
-      "mv /tmp/ssh-lock.sh      /var/lib/cloud/scripts/per-instance/01-lock-ssh.sh",
-      "chmod 700                /var/lib/cloud/scripts/per-instance/01-lock-ssh.sh",
-      "mv /tmp/system-setup.sh  /var/lib/cloud/scripts/per-instance/02-setup-system.sh",
-      "chmod 700                /var/lib/cloud/scripts/per-instance/02-setup-system.sh",
+      "mv /tmp/system-setup.sh  /var/lib/cloud/scripts/per-instance/01-setup-system.sh",
+      "chmod 700                /var/lib/cloud/scripts/per-instance/01-setup-system.sh",
       "mv /tmp/ssh-unlock.sh    /var/lib/cloud/scripts/per-instance/09-unlock-ssh.sh",
       "chmod 700                /var/lib/cloud/scripts/per-instance/09-unlock-ssh.sh"
     ]
@@ -71,8 +63,8 @@ build {
   provisioner "shell" {
     inline = [
       "mkdir -p                 /var/lib/cloud/scripts/per-instance/",
-      "cp /tmp/wg-setup.sh      /var/lib/cloud/scripts/per-instance/03-setup-wireguard.sh",
-      "chmod 700                /var/lib/cloud/scripts/per-instance/03-setup-wireguard.sh",
+      "cp /tmp/wg-setup.sh      /var/lib/cloud/scripts/per-instance/02-setup-wireguard.sh",
+      "chmod 700                /var/lib/cloud/scripts/per-instance/02-setup-wireguard.sh",
       "mv /tmp/wg-setup.sh      /root/regen-vpn-keys.sh",
       "chmod 700                /root/regen-vpn-keys.sh"
     ]
@@ -86,8 +78,8 @@ build {
   provisioner "shell" {
     inline = [
       "mkdir -p                 /var/lib/cloud/scripts/per-instance/",
-      "mv /tmp/pihole-setup.sh  /var/lib/cloud/scripts/per-instance/04-setup-pihole.sh",
-      "chmod 700                /var/lib/cloud/scripts/per-instance/04-setup-pihole.sh",
+      "mv /tmp/pihole-setup.sh  /var/lib/cloud/scripts/per-instance/03-setup-pihole.sh",
+      "chmod 700                /var/lib/cloud/scripts/per-instance/03-setup-pihole.sh",
     ]
   }
 
@@ -99,8 +91,8 @@ build {
   provisioner "shell" {
     inline = [
       "mkdir -p                 /var/lib/cloud/scripts/per-instance/",
-      "mv /tmp/unbound-setup.sh /var/lib/cloud/scripts/per-instance/05-setup-unbound.sh",
-      "chmod 700                /var/lib/cloud/scripts/per-instance/05-setup-unbound.sh",
+      "mv /tmp/unbound-setup.sh /var/lib/cloud/scripts/per-instance/04-setup-unbound.sh",
+      "chmod 700                /var/lib/cloud/scripts/per-instance/04-setup-unbound.sh",
     ]
   }
 
@@ -108,6 +100,7 @@ build {
   provisioner "shell" {
     scripts = [
       "scripts/image-cleanup.sh",
+      "scripts/ssh-lock.sh",
       "scripts/image-check.sh"
     ]
   }

@@ -14,7 +14,6 @@
 echo "Lock SSH during system setup ..."
 cat >> /etc/ssh/sshd_config <<EOM
 Match User root
-        ForceCommand echo "Please wait while we perform initial setup ..."
+    ForceCommand printf "Please wait while we perform initial setup....\n\nNB: If you attempt to SSH in too frequently, the firewall will temporarily lock you out.\nWe recommend putting a sleep 15 after your ssh command, e.g.\n\n    ssh root@\$(ip -4 a s scope global eth0 | grep 'inet ' | grep -v 'inet 10\.' | awk -F'[ \t/]+' '{printf \$3}') || sleep 15\n\n"; false
 EOM
-systemctl restart ssh
 echo "SSH locked."
