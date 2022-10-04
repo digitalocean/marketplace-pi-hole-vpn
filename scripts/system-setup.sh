@@ -35,12 +35,13 @@ do
     "${cmd}" -A INPUT -i eth0 -p udp -m udp ! --dport 51820 -j DROP
     "${cmd}" -A INPUT -i eth0 -p tcp -m tcp --dport 22 -m recent --update --seconds 60 --hitcount 6 --name SSH --rsource -j DROP
     "${cmd}" -A INPUT -i eth0 -p tcp -m tcp --dport 22 -m recent --set --name SSH --rsource -j ACCEPT
-    "${cmd}" -A INPUT -p icmp -m limit --limit 60/minute --limit-burst 120 -j ACCEPT
     "${cmd}" -A INPUT -i lo -j ACCEPT
     "${cmd}" -P INPUT DROP
     "${cmd}" -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
     "${cmd}" -P FORWARD DROP
 done
+iptables  -A INPUT -p      icmp -m limit --limit 60/minute --limit-burst 120 -j ACCEPT
+ip6tables -A INPUT -p ipv6-icmp -m limit --limit 60/minute --limit-burst 120 -j ACCEPT
 mkdir -p /etc/iptables
 iptables -Z -t nat
 iptables -Z

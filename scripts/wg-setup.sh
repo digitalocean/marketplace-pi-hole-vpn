@@ -14,38 +14,19 @@
 wg_conf () {
     nconfs="${1:-1}"
     print_conf="${2:-true}"
-    IP4="$(ip -4 a s scope global eth0 | grep 'inet ' | grep -v 'inet 10\.' | awk -F'[ \t/]+' '{print $3}')"
-    IP6="$(ip -6 a s scope global eth0 | grep 'inet6 ' | awk -F'[ \t/]+' '{print $3}')"
-    postup="\
-iptables  -w -A PREROUTING -d $IP4 -p udp -m multiport --dports 123,1194 -j REDIRECT --to-ports 51820 -t nat; \
-ip6tables -w -A PREROUTING -d $IP6 -p udp -m multiport --dports 123,1194 -j REDIRECT --to-ports 51820 -t nat; \
-iptables  -w -A INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT; \
-ip6tables -w -A INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT; \
-iptables  -w -A INPUT -i wg0 -j ACCEPT; \
-ip6tables -w -A INPUT -i wg0 -j ACCEPT; \
-iptables  -w -A FORWARD -i wg0 -j ACCEPT; \
-ip6tables -w -A FORWARD -i wg0 -j ACCEPT; \
-iptables  -w -A POSTROUTING -o eth0 -j MASQUERADE -t nat; \
-ip6tables -w -A POSTROUTING -o eth0 -j MASQUERADE -t nat"
-    postdown="\
-iptables  -w -D PREROUTING -d $IP4 -p udp -m multiport --dports 123,1194 -j REDIRECT --to-ports 51820 -t nat; \
-ip6tables -w -D PREROUTING -d $IP6 -p udp -m multiport --dports 123,1194 -j REDIRECT --to-ports 51820 -t nat; \
-iptables  -w -D INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT; \
-ip6tables -w -D INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT; \
-iptables  -w -D INPUT -i wg0 -j ACCEPT; \
-ip6tables -w -D INPUT -i wg0 -j ACCEPT; \
-iptables  -w -D FORWARD -i wg0 -j ACCEPT; \
-ip6tables -w -D FORWARD -i wg0 -j ACCEPT; \
-iptables  -w -D POSTROUTING -o eth0 -j MASQUERADE -t nat; \
-ip6tables -w -D POSTROUTING -o eth0 -j MASQUERADE -t nat"
+    server_ip="$(ip -6 a s scope global eth0 | grep 'inet6 ' | awk -F'[ \t/]+' '{print $3}')"
+    if [ -n "${server_ip}" ]
+    then
+        server_ip="[${server_ip}]"
+    else
+        server_ip="$(ip -4 a s scope global eth0 | grep 'inet ' | grep -v 'inet 10\.' | awk -F'[ \t/]+' '{print $3}')"
+    fi
     pvk="$(wg genkey)"
     spbk="$(echo -n "${pvk}" | wg pubkey)"
     wg0_conf="[Interface]
 Address = 10.2.53.1/24, fc10:253::1/32
 ListenPort = 51820
 PrivateKey = ${pvk}
-PostUp = ${postup}
-PostDown = ${postdown}
 "
     output=""
     for i in $(seq "${nconfs}")
@@ -57,11 +38,11 @@ PostDown = ${postdown}
         conf="\
 [Interface]
 Address = ${addrs}
-DNS = 10.2.53.1
+DNS = 10.2.53.1, fc10:253::1
 PrivateKey = ${pvk}
 
 [Peer]
-Endpoint = ${IP4}:51820
+Endpoint = ${server_ip}:51820
 PersistentKeepalive = 25
 PublicKey = ${spbk}
 PresharedKey = ${psk}"
@@ -140,7 +121,26 @@ done
 sysctl -p
 echo "Forwarding enabled."
 
-echo "STEP 3: Configure WireGuard ..."
+echo "STEP 3: Configure firewall ..."
+for cmd in iptables ip6tables
+do
+    "${cmd}" -A PREROUTING -i eth0 -p udp -m multiport --dports 123,1194 -j REDIRECT --to-ports 51820 -t nat
+    "${cmd}" -A INPUT -i eth0 -p udp -m udp --dport 51820 -j ACCEPT
+    "${cmd}" -A INPUT -i wg0 -j ACCEPT
+    "${cmd}" -A FORWARD -i wg0 -j ACCEPT
+    "${cmd}" -A POSTROUTING -o eth0 -j MASQUERADE -t nat
+done
+mkdir -p /etc/iptables
+iptables -Z -t nat
+iptables -Z
+iptables-save > /etc/iptables/rules.v4
+ip6tables -Z -t nat
+ip6tables -Z
+ip6tables-save > /etc/iptables/rules.v6
+
+echo "Firewall configuration complete."
+
+echo "STEP 4: Configure WireGuard ..."
 echo -n "#!/bin/sh
 cat <<EOF
 =========================================================================
@@ -160,7 +160,7 @@ chmod 700 /etc/update-motd.d/99-getting-started
 echo "Wireguard and MotD configuration complete."
 
 
-echo "STEP 4: Update README ..."
+echo "STEP 5: Update README ..."
 touch /root/README
 perl -C -Mutf8 -i -p0e \
     's/^\n+█▀+\n█ WIREGUARD.*WIREGUARD █\n▄+█\n//sme' \
@@ -175,6 +175,13 @@ WireGuard is the VPN software used. Consider donating at:
 
                  wireguard.com/donations
                  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+
+
+NB: If the server has a public IPv6 address, that address will be
+used in the client configs. The server's public IPv4 address is
+only set in the client configs if there is no public IPv6 address.
+If the IPv4 address is preferred (or required) by the client,
+simply update it in the corresponding client config manually.
 
 
 Have multiple clients / users?
