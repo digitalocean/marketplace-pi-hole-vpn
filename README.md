@@ -11,18 +11,11 @@ Cool, cool cool cool...so how do I...
 
 ## Use It
 
-**NB:** The image has not yet been posted to the Marketplace. Stay
-tuned. In the meantime, you can create your own image if you like.
-See the [Create the Pi-hole VPN
-Image](#create-the-pi-hole-vpn-image) section below.
-
 If you want to get up and running in as little time as possible:
 
-1. Go [here](https://marketplace.digitalocean.com/) (TODO: Change
-   to direct link once image is posted on the Marketplace) &
-   create a Droplet
-2. SSH in & scan the QR code(s) presented from the [WireGuard
-   App](https://www.wireguard.com/install/)
+1. Go [here](https://marketplace.digitalocean.com/apps/pi-hole-vpn), create a Droplet, and SSH in \[[video guide](https://www.youtube.com/watch?v=n-rL02390AI)]
+2. Scan the QR code(s) presented from the [WireGuard
+   App](https://www.wireguard.com/install/) \[[video guide](https://www.youtube.com/watch?v=0N_N-NpHIB4)]
 3. Profit
 
 Slightly more info:
