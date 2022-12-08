@@ -1,0 +1,15 @@
+# Documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "terraform"
+    directory: /terraform
+    schedule:
+      interval: monthly
+    reviewers:
+      - CrashenX
+    commit-message:
+      prefix: fix
+      prefix-development: chore
+      include: scope
