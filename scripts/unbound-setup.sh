@@ -43,6 +43,18 @@ server:
     private-address: 10.0.0.0/8
     private-address: fc00::/7
     private-address: fe80::/10
+auth-zone:
+    name: "."
+    master: "b.root-servers.net"
+    master: "c.root-servers.net"
+    master: "d.root-servers.net"
+    master: "f.root-servers.net"
+    master: "g.root-servers.net"
+    master: "k.root-servers.net"
+        fallback-enabled: yes
+    for-downstream: no
+    for-upstream: yes
+    zonefile: "root.zone"
 EOF
 mkdir -p /etc/dnsmasq.d
 echo 'edns-packet-max=1232' > /etc/dnsmasq.d/99-edns.conf
