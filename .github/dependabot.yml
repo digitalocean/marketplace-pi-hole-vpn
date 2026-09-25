@@ -13,3 +13,13 @@ updates:
       prefix: fix
       prefix-development: chore
       include: scope
+
+  - package-ecosystem: "github-actions"
+    directory: /
+    schedule:
+      interval: monthly
+    reviewers:
+      - CrashenX
+    commit-message:
+      prefix: chore
+      include: scope
