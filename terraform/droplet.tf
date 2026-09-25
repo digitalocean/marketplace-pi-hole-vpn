@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.2.0"
+
   required_providers {
     digitalocean = {
       source  = "digitalocean/digitalocean"
@@ -9,11 +11,19 @@ terraform {
 
 # Set the variable values in terraform.tfvars
 # or using -var="..." CLI option
-variable "do_token" {}
-variable "image" {}
-variable "ssh_keys" { type = list(number) }
+variable "do_token" {
+  type      = string
+  sensitive = true
+}
 
-# Configure the DigitalOcean Provider
+variable "image" {
+  type = string
+}
+
+variable "ssh_keys" {
+  type = list(number)
+}
+
 provider "digitalocean" {
   token = var.do_token
 }
@@ -25,6 +35,6 @@ resource "digitalocean_droplet" "pihole" {
   monitoring    = false
   name          = "pihole"
   region        = "nyc1"
-  size          = "s-1vcpu-512mb-10gb"
+  size          = "s-1vcpu-1gb"
   ssh_keys      = var.ssh_keys
 }

@@ -1,0 +1,11 @@
+# Default Pi-hole adlists for marketplace-pi-hole-vpn
+# One URL per line. Lines starting with # are ignored.
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+http://sysctl.org/cameleon/hosts
+https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+https://raw.githubusercontent.com/jkrejcha/AdmiraList/master/AdmiraList.txt
+https://urlhaus.abuse.ch/downloads/hostfile/
+https://s3.amazonaws.com/lists.disconnect.me/simple_malvertising.txt
+https://v.firebog.net/hosts/Prigent-Crypto.txt
+https://phishing.army/download/phishing_army_blocklist_extended.txt

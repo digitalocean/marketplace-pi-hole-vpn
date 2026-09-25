@@ -15,5 +15,5 @@ echo "Unlock SSH ..."
 sed -e '/Match User root/d' \
     -e '/.*ForceCommand.*initial setup.*/d' \
     -i /etc/ssh/sshd_config
-systemctl restart ssh
+systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || service ssh restart
 echo "SSH unlocked."
